@@ -1,0 +1,16 @@
+{
+  "CognitoStack": {
+    "AuthenticatedRoleName": "CognitoStack-CognitoDefaultAuthenticatedRoleC5D5C31-RC8x3HqSoWyr",
+    "UserPoolClientId": "1h8ukn815duicg884nv37ca2o6",
+    "UserPoolId": "us-east-1_jihxwsZCX",
+    "IdentityPoolId": "us-east-1:46b45ec3-70c1-4798-91bb-330d5f431d8c",
+    "UnauthenticatedRoleName": "CognitoStack-CognitoDefaultUnauthenticatedRoleABBF7-FB0gRnwwv7kr"
+  },
+  "FrontendStack": {
+    "BucketArn": "arn:aws:s3:::frontendstack-reactappbuckete340e270-ntgystziadxw",
+    "BucketName": "frontendstack-reactappbuckete340e270-ntgystziadxw",
+    "DomainName": "d2g616vd3ybkz1.cloudfront.net",
+    "BucketUrl": "s3://frontendstack-reactappbuckete340e270-ntgystziadxw",
+    "DistributionId": "EY4ZMU61NMJ7F"
+  }
+}
