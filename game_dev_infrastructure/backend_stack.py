@@ -9,13 +9,17 @@ from aws_cdk import (
 import aws_cdk as cdk
 
 
-class CognitoStack(Stack):
-    """AWS CDK stack for basic Cognito User Pool and Identity Pool."""
+class BackendStack(Stack):
+    """AWS CDK stack foyr basic Cognito User Pool and Identity Pool."""
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         """Initialize CognitoStack."""
         super().__init__(scope, construct_id, **kwargs)
 
+        self.create_cognito_resources()
+        self.create_rest_api_resources()
+
+    def create_cognito_resources(self):
         # Create Cognito User Pool with email as username
         user_pool = cognito.UserPool(
             self, "UserPool",
@@ -128,3 +132,47 @@ class CognitoStack(Stack):
             self, "UnauthenticatedRoleName",
             value=unauthenticated_role.role_name,
         )
+    def create_rest_api_resources(self):
+        logs_group = cdk.aws_iam.Group(self, "CloudFrontLogGroup")
+        # Create a python Lambda function to handle the API Gateway requests with a maximum timeout of 30 seconds
+        handler = cdk.aws_lambda.Function(
+            self, 
+            "FrontendHandler",
+            runtime=cdk.aws_lambda.Runtime.PYTHON_3_8,
+            handler="index.handler",
+            code=cdk.aws_lambda.Code.from_asset("lambda_build"),
+            timeout=cdk.Duration.seconds(60)
+        )
+        api_gateway = cdk.aws_apigateway.LambdaRestApi(
+            self,
+            "ApiGatewayLambda",
+            # This might give a type error but it is
+            # Completely fine
+            handler=handler,
+            rest_api_name=f"game-dev-api",
+            deploy_options=cdk.aws_apigateway.StageOptions(
+                access_log_destination=cdk.aws_apigateway.LogGroupLogDestination(
+                    logs_group
+                ),
+                access_log_format=cdk.aws_apigateway.AccessLogFormat.json_with_standard_fields(
+                    http_method=True,
+                    ip=True,
+                    caller=True,
+                    protocol=True,
+                    request_time=True,
+                    resource_path=True,
+                    response_length=True,
+                    status=True,
+                    user=True,
+                ),
+            ),
+        )
+
+        cdk.CfnOutput(
+            self,
+            "ApiUrl",
+            export_name="ApiUrl",
+            value=api_gateway.url,
+        )
+        stack = cdk.Stack.of(self)
+        stack.api_gateway_id = api_gateway.rest_api_id

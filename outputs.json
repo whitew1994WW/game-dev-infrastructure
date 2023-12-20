@@ -1,10 +1,13 @@
 {
   "CognitoStack": {
     "AuthenticatedRoleName": "CognitoStack-CognitoDefaultAuthenticatedRoleC5D5C31-RC8x3HqSoWyr",
+    "ApiGatewayLambdaEndpointF8F1EF15": "https://ohdu94k2sc.execute-api.us-east-1.amazonaws.com/prod/",
     "UserPoolClientId": "1h8ukn815duicg884nv37ca2o6",
     "UserPoolId": "us-east-1_jihxwsZCX",
+    "ApiUrl": "https://ohdu94k2sc.execute-api.us-east-1.amazonaws.com/prod/",
     "IdentityPoolId": "us-east-1:46b45ec3-70c1-4798-91bb-330d5f431d8c",
-    "UnauthenticatedRoleName": "CognitoStack-CognitoDefaultUnauthenticatedRoleABBF7-FB0gRnwwv7kr"
+    "UnauthenticatedRoleName": "CognitoStack-CognitoDefaultUnauthenticatedRoleABBF7-FB0gRnwwv7kr",
+    "ExportsOutputRefApiGatewayLambda25FC2E302302D4B4": "ohdu94k2sc"
   },
   "FrontendStack": {
     "BucketArn": "arn:aws:s3:::frontendstack-reactappbuckete340e270-ntgystziadxw",
