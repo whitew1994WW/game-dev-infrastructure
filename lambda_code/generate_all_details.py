@@ -1,13 +1,14 @@
 import json
 import requests
+from errors import ValidationError
 
 
 openai_api_key = "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"
 
-def query_openai_chat_gpt4(prompt):
+def query_openai_chat_gpt4(prompt, api_key):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {openai_api_key}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     data = {
@@ -20,10 +21,10 @@ def query_openai_chat_gpt4(prompt):
     response = requests.post(url, headers=headers, json=data)
     return response.json()['choices'][0]['message']['content']
 
-def query_openai_gpt3_5(prompt):
+def query_openai_gpt3_5(prompt, api_key):
     url = "https://api.openai.com/v1/completions"
     headers = {
-        "Authorization": f"Bearer {openai_api_key}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     data = {
@@ -158,13 +159,19 @@ def parse_colour_scheme(colour_scheme):
 
 def generate_all_details(event):
     body, missing_options, present_options = handle_inputs(event)
+    if 'apiKey' not in body:
+        raise ValidationError('API key not provided')
+    
+    username = body['username']
+    apikey = body['apiKey']
+    body = body['storyBoardState']
     print(f'Body: {body}')
     print(f'Missing options: {missing_options}')
     print(f'Present options: {present_options}')
     item_prompts, prompt = build_prompt(body, missing_options, present_options)
     print(prompt)
     # raise Exception(prompt)
-    generated_text = query_openai_gpt3_5(prompt)
+    generated_text = query_openai_gpt3_5(prompt, apikey)
     generated_text = generated_text + '\n***'
     print(generated_text)
 

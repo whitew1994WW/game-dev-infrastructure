@@ -41,7 +41,7 @@ class FrontendStack(Stack):
             protocol_policy=cdk.aws_cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
         )
 
-                # CloudFront Security & Headers
+        # CloudFront Security & Headers
         security_headers_beahaviour = aws_cloudfront.ResponseSecurityHeadersBehavior(
             content_type_options=aws_cloudfront.ResponseHeadersContentTypeOptions(
                 override=True,

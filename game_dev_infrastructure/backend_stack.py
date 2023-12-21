@@ -16,8 +16,8 @@ class BackendStack(Stack):
         """Initialize CognitoStack."""
         super().__init__(scope, construct_id, **kwargs)
 
-        self.create_cognito_resources()
-        self.create_rest_api_resources()
+        user_pool = self.create_cognito_resources()
+        self.create_rest_api_resources(user_pool)
 
     def create_cognito_resources(self):
         # Create Cognito User Pool with email as username
@@ -132,7 +132,10 @@ class BackendStack(Stack):
             self, "UnauthenticatedRoleName",
             value=unauthenticated_role.role_name,
         )
-    def create_rest_api_resources(self):
+        return user_pool
+    
+    def create_rest_api_resources(self, user_pool):
+            
         logs_group = cdk.aws_iam.Group(self, "CloudFrontLogGroup")
         # Create a python Lambda function to handle the API Gateway requests with a maximum timeout of 30 seconds
         handler = cdk.aws_lambda.Function(
@@ -167,6 +170,7 @@ class BackendStack(Stack):
                 ),
             ),
         )
+
 
         cdk.CfnOutput(
             self,
