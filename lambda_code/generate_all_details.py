@@ -30,7 +30,7 @@ def query_openai_gpt3_5(prompt, api_key):
     data = {
         "model": "gpt-3.5-turbo-instruct",  # Specify the model here
         "prompt": prompt,
-        "max_tokens": 3000,
+        "max_tokens": 1500,
         'temperature': 0.5
     }
     response = requests.post(url, headers=headers, json=data)
@@ -87,6 +87,10 @@ def extract_variables(response, missing_options, item_prompts):
 def handle_inputs(event):
     potential_body_options = ['gameDescription', 'gameType', 'graphicView', 'graphicStyle', 'multiplayerOption', 'plot', 'characters', 'colourSchemes', 'styleKeywords', 'environments']
     body = json.loads(event['body'])
+    if 'apiKey' not in body:
+        raise ValidationError('API key not provided')
+    apikey = body['apiKey']
+    body = body['storyBoardState']
     if 'characters' in body:
         if len(body['characters']) == 0:
             body['characters'] = ''
@@ -116,7 +120,7 @@ def handle_inputs(event):
             missing_options.append(option)
 
 
-    return body,missing_options,present_options
+    return body,missing_options,present_options, apikey
 
 def build_prompt(body, missing_options, present_options):
     initial_prompt = """You are a script writer for a 2D video game company. You have been given a game description, the graphic view of the game (for instance isometric/top down/side scroller), the game type (for instance action/adventure/role playing) and the multiplayer option (for instance single player/online multiplayer/local multiplayer)."""
@@ -130,7 +134,7 @@ def build_prompt(body, missing_options, present_options):
         'characters': """character list, with a label of either 'player', 'friendly' or 'enemy'. Format the output as a json list with list elements having keys "name", "label" and "description". The description should be a physical description of the character only and not other details.""",
         'colourSchemes': """colour scheme, comma seperated list of at least 5 precise colour names with a label describing how the colour fits into the palette. Format the output as a json list with list elements having keys "colour" and "label".""",
         'styleKeywords': """style keywords, comma seperated list of at least 10 words that describe the style of the game e.g. "fantasy, medieval, futuristic, modern, historic, gory, cute".""",
-        'environments': """environments, comma seperated list of at least 5 environments and a short description of the what the scene looks like. Format the output as a valid json list with list elements having keys "name" and "description".""",
+        'environments': """environments, comma seperated list of at least 5 environments and a short description. The description should be a visual description only and not include other details. Format the output as a valid json list with list elements having keys "name" and "description".""",
     }
 
 
@@ -158,13 +162,8 @@ def parse_colour_scheme(colour_scheme):
     return json.loads(colour_scheme)
 
 def generate_all_details(event):
-    body, missing_options, present_options = handle_inputs(event)
-    if 'apiKey' not in body:
-        raise ValidationError('API key not provided')
-    
-    username = body['username']
-    apikey = body['apiKey']
-    body = body['storyBoardState']
+    body, missing_options, present_options, apikey = handle_inputs(event)
+
     print(f'Body: {body}')
     print(f'Missing options: {missing_options}')
     print(f'Present options: {present_options}')
